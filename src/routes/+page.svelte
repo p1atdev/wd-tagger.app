@@ -1,14 +1,33 @@
 <script lang="ts">
-  import { commands } from "@/bindings";
+  import { type InferenceArgs, commands } from "@/bindings";
 
-  let name = $state("");
-  let greetMsg = $state("");
+  let imagePath = $state("");
+  let prediction = $state("");
 
-  async function greet(event: Event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await commands.helloWorld(name);
-  }
+  const predict = async () => {
+    const args: InferenceArgs = {
+      model_args: {
+        repo_id: "SmilingWolf/wd-swinv2-tagger-v3",
+        model_file: "model.onnx",
+        config_file: "config.json",
+        tag_csv_file: "selected_tags.csv",
+      },
+      image_path: imagePath,
+    };
+
+    const result = await commands.inferenceSingleImage(args);
+    switch (result.status) {
+      case "ok": {
+        prediction = JSON.stringify(result.data);
+        break;
+      }
+      case "error": {
+        console.error(result.error);
+        prediction = result.error.toString();
+        break;
+      }
+    }
+  };
 </script>
 
 <main class="container">
@@ -27,11 +46,15 @@
   </div>
   <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
 
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+  <form class="row" onsubmit={predict}>
+    <input
+      id="greet-input"
+      placeholder="Enter an image path..."
+      bind:value={imagePath}
+    />
+    <button type="submit">Predict</button>
   </form>
-  <p>{greetMsg}</p>
+  <p>{prediction}</p>
 </main>
 
 <style>

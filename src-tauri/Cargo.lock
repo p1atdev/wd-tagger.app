@@ -4727,6 +4727,8 @@ dependencies = [
 name = "tagger_desktop"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "image",
  "serde",
  "serde_json",
  "specta",
@@ -4735,6 +4737,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-opener",
  "tauri-specta",
+ "thiserror 2.0.11",
  "wd-tagger",
 ]
 

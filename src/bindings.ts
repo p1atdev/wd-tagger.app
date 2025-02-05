@@ -7,6 +7,14 @@
 export const commands = {
 async helloWorld(myName: string) : Promise<string> {
     return await TAURI_INVOKE("hello_world", { myName });
+},
+async inferenceSingleImage(args: InferenceArgs) : Promise<Result<InferenceResult, TaggerError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("inference_single_image", { args }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -20,7 +28,10 @@ async helloWorld(myName: string) : Promise<string> {
 
 /** user-defined types **/
 
-
+export type InferenceArgs = { model_args: ModelArgs; image_path: string }
+export type InferenceResult = { rating: Partial<{ [key in string]: number }>; character: Partial<{ [key in string]: number }>; general: Partial<{ [key in string]: number }> }
+export type ModelArgs = { repo_id: string; model_file: string; config_file: string; tag_csv_file: string }
+export type TaggerError = "Io" | "Image" | { Tagger: string }
 
 /** tauri-specta globals **/
 

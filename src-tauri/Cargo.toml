@@ -28,3 +28,6 @@ wd-tagger = { git = "https://github.com/p1atdev/wd-tagger-rs", version = "0.1.0"
 specta = { version = "=2.0.0-rc.22" }
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
+anyhow = "1.0.95"
+image = "0.25.5"
+thiserror = "2.0.11"
