@@ -1,178 +1,115 @@
 <script lang="ts">
-  import { type InferenceArgs, commands } from "@/bindings";
+  import {
+    type BatchleInferenceArgs,
+    type InferenceResult,
+    commands,
+  } from "@/bindings";
+  import Dropzone from "@/components/dropzone.svelte";
+  import Icon from "@iconify/svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
 
-  let imagePath = $state("");
-  let prediction = $state("");
+  let predictions = $state<InferenceResult[]>([]);
+  let files = $state<string[]>([]);
+  let isProcessing = $state(false);
+  let errorMessage = $state("");
 
-  const predict = async () => {
-    const args: InferenceArgs = {
+  const predict = async (image_paths: string[]) => {
+    const args: BatchleInferenceArgs = {
       model_args: {
         repo_id: "SmilingWolf/wd-swinv2-tagger-v3",
         model_file: "model.onnx",
         config_file: "config.json",
         tag_csv_file: "selected_tags.csv",
       },
-      image_path: imagePath,
+      image_paths: image_paths,
     };
 
-    const result = await commands.inferenceSingleImage(args);
+    const result = await commands.inferenceBatchImages(args);
+    predictions = [];
+    errorMessage = "";
     switch (result.status) {
       case "ok": {
-        prediction = JSON.stringify(result.data);
+        predictions = result.data;
         break;
       }
       case "error": {
         console.error(result.error);
-        prediction = result.error.toString();
+        errorMessage = result.error.toString();
         break;
       }
     }
   };
+
+  const onFilesSelected = async (files: string[]) => {
+    console.log(files);
+    isProcessing = true;
+    await predict(files);
+    isProcessing = false;
+  };
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
+<main class="relative w-full background dotted-bg">
+  <div class="flex h-full w-full">
+    <div
+      class="grow h-full flex flex-col justify-center overflow-y-scroll overflow-x-hidden"
+    >
+      <Dropzone
+        bind:files
+        onDrop={(files) => {
+          onFilesSelected(files);
+        }}
+      />
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
+      {#if files.length === 0}
+        <div class="flex flex-col items-center gap-y-4">
+          <Icon class="size-16" icon="mdi:file-upload" />
+          <p>Drop your images here</p>
+        </div>
+      {/if}
+
+      <div class="flex flex-col items-center gap-y-8 pt-8 relative">
+        {#each files as file, i}
+          <img
+            class="w-[50%] rounded-sm hover:scale-105 duration-150 transition-all"
+            src={convertFileSrc(file)}
+            alt="image {i}"
+          />
+        {/each}
+      </div>
+    </div>
+
+    <div
+      class="flex-none top-0 right-0 max-w-[33%] w-sm h-full overflow-y-scroll"
+    >
+      <div class="h-full mt-6 mr-6 bg-blue-500 opacity-80 rounded-md">
+        <div class="max-w-full h-full">
+          {#if isProcessing}
+            <div class="pt-32 flex flex-col gap-y-4">
+              <Icon class="animate-spin size-16 mx-auto" icon="mdi:loading" />
+              <p class="text-sm">Processing...</p>
+            </div>
+          {/if}
+
+          {errorMessage}
+
+          {#each predictions as prediction}
+            <div>
+              {JSON.stringify(prediction)}
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
   </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" onsubmit={predict}>
-    <input
-      id="greet-input"
-      placeholder="Enter an image path..."
-      bind:value={imagePath}
-    />
-    <button type="submit">Predict</button>
-  </form>
-  <p>{prediction}</p>
 </main>
 
 <style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte-kit:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
-
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-
-    color: #0f0f0f;
-    background-color: #f6f6f6;
-
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  .container {
+  .background {
     margin: 0;
-    padding-top: 10vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
-  }
-
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: 0.75s;
-  }
-
-  .logo.tauri:hover {
-    filter: drop-shadow(0 0 2em #24c8db);
-  }
-
-  .row {
-    display: flex;
-    justify-content: center;
-  }
-
-  a {
-    font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-  }
-
-  a:hover {
-    color: #535bf2;
-  }
-
-  h1 {
-    text-align: center;
-  }
-
-  input,
-  button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    color: #0f0f0f;
-    background-color: #ffffff;
-    transition: border-color 0.25s;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  button:hover {
-    border-color: #396cd8;
-  }
-  button:active {
-    border-color: #396cd8;
-    background-color: #e8e8e8;
-  }
-
-  input,
-  button {
-    outline: none;
-  }
-
-  #greet-input {
-    margin-right: 5px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      color: #f6f6f6;
-      background-color: #2f2f2f;
-    }
-
-    a:hover {
-      color: #24c8db;
-    }
-
-    input,
-    button {
-      color: #ffffff;
-      background-color: #0f0f0f98;
-    }
-    button:active {
-      background-color: #0f0f0f69;
-    }
+    height: 100vh;
   }
 </style>

@@ -3,7 +3,10 @@ mod tagger;
 use specta_typescript::Typescript;
 use tauri_specta::{collect_commands, Builder};
 
-use tagger::{inference_single_image, InferenceArgs, InferenceResult, ModelArgs, TaggerError};
+use tagger::{
+    inference_batch_images, inference_single_image, BatchleInferenceArgs, InferenceResult,
+    ModelArgs, SingleInferenceArgs, TaggerError,
+};
 
 #[tauri::command]
 #[specta::specta] // < You must annotate your commands
@@ -15,9 +18,14 @@ fn hello_world(my_name: String) -> String {
 pub fn run() {
     let mut builder = Builder::<tauri::Wry>::new()
         // Then register them (separated by a comma)
-        .commands(collect_commands![hello_world, inference_single_image])
+        .commands(collect_commands![
+            hello_world,
+            inference_single_image,
+            inference_batch_images
+        ])
         .typ::<ModelArgs>()
-        .typ::<InferenceArgs>()
+        .typ::<SingleInferenceArgs>()
+        .typ::<BatchleInferenceArgs>()
         .typ::<InferenceResult>()
         .typ::<TaggerError>();
 

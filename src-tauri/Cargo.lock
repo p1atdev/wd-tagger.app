@@ -1927,6 +1927,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "http-range"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21dec9db110f5f872ed9699c3ecf50cf16f423502706ba5c72462e28d3157573"
+
+[[package]]
 name = "httparse"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4728,6 +4734,7 @@ name = "tagger_desktop"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "futures",
  "image",
  "serde",
  "serde_json",
@@ -4738,6 +4745,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-specta",
  "thiserror 2.0.11",
+ "tokio",
  "wd-tagger",
 ]
 
@@ -4824,6 +4832,7 @@ dependencies = [
  "gtk",
  "heck 0.5.0",
  "http",
+ "http-range",
  "jni",
  "libc",
  "log",
