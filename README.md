@@ -1,7 +1,21 @@
-# Tauri + SvelteKit + TypeScript
+# wd-tagger.app
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
+Run [Waifu Diffusion tagger](https://huggingface.co/spaces/SmilingWolf/wd-tagger) as a desktop GUI app, no Python required.
 
-## Recommended IDE Setup
+> [!NOTE]
+> WIP
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+## Tech Stack
+
+- Backend
+  - [Tauri v2](https://v2.tauri.app/)
+  - [Tauri Specta](https://github.com/specta-rs/tauri-specta/tree/feat/tauri-v2-stable)
+  - [wd-tagger-rs](https://github.com/p1atdev/wd-tagger-rs)
+- Frontend
+  - [Svelte/SvelteKit](https://svelte.jp/)
+  - [TailwindCSS](https://tailscale.com/)
+
+
+## Screenshot
+
+![](./doc/screenshot_01.jpg)
