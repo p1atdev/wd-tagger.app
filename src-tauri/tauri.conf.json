@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tagger_desktop",
+  "productName": "wd-tagger",
   "version": "0.1.0",
-  "identifier": "dev.p1at.tagger_desktop",
+  "identifier": "dev.p1at.wd-tagger.app",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
