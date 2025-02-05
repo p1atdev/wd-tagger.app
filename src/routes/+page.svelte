@@ -5,8 +5,15 @@
     commands,
   } from "@/bindings";
   import Dropzone from "@/components/dropzone.svelte";
+  import ProbabilitiesDisplay from "@/components/probabilitiesDisplay.svelte";
+  import { filterTagsByThreshold } from "@/lib/tags";
+  import {
+    type Probabilities,
+    probabilitiesType,
+  } from "@/schema/probabilities";
   import Icon from "@iconify/svelte";
   import { convertFileSrc } from "@tauri-apps/api/core";
+  import { type } from "arktype";
 
   let predictions = $state<InferenceResult[]>([]);
   let files = $state<string[]>([]);
@@ -46,6 +53,17 @@
     await predict(files);
     isProcessing = false;
   };
+
+  const validateProbabilities = (
+    probs: Partial<{ [key in string]: number }>,
+  ): Probabilities => {
+    const result = probabilitiesType(probs);
+    if (result instanceof type.errors) {
+      console.error(result);
+      return {} satisfies Probabilities;
+    }
+    return result;
+  };
 </script>
 
 <main class="relative w-full background dotted-bg">
@@ -70,7 +88,7 @@
       <div class="flex flex-col items-center gap-y-8 pt-8 relative">
         {#each files as file, i}
           <img
-            class="w-[50%] rounded-sm hover:scale-105 duration-150 transition-all"
+            class="max-w-md w-[60%] rounded-sm hover:scale-105 duration-150 transition-all"
             src={convertFileSrc(file)}
             alt="image {i}"
           />
@@ -78,26 +96,50 @@
       </div>
     </div>
 
-    <div
-      class="flex-none top-0 right-0 max-w-[33%] w-sm h-full overflow-y-scroll"
-    >
-      <div class="h-full mt-6 mr-6 bg-blue-500 opacity-80 rounded-md">
-        <div class="max-w-full h-full">
-          {#if isProcessing}
-            <div class="pt-32 flex flex-col gap-y-4">
-              <Icon class="animate-spin size-16 mx-auto" icon="mdi:loading" />
-              <p class="text-sm">Processing...</p>
-            </div>
-          {/if}
-
-          {errorMessage}
-
-          {#each predictions as prediction}
+    <div class="relative max-w-[40%] w-sm overflow-y-scroll overflow-x-hidden">
+      <div
+        class="absolute top-0 left-0 mt-6 mr-6 right-0 rounded-md max-w-full flex flex-col bg-blue-500/80"
+      >
+        {errorMessage}
+        {#if isProcessing}
+          <div
+            class="flex flex-col h-[100vh] justify-center text-center gap-y-4 pb-32"
+          >
+            <Icon class="animate-spin size-16 mx-auto" icon="mdi:loading" />
+            <p class="text-sm text-center">Processing...</p>
+          </div>
+        {:else if predictions.length > 0}
+          <div class="flex flex-col gap-y-6">
             <div>
-              {JSON.stringify(prediction)}
+              {#each predictions as prediction}
+                <section class="flex flex-col gap-y-4 my-8 px-6">
+                  <div>
+                    <h3 class="text-lg font-bold mb-1">Character tags</h3>
+                    <ProbabilitiesDisplay
+                      probabilities={filterTagsByThreshold(
+                        validateProbabilities(prediction.character),
+                        0.35,
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold mb-1">General tags</h3>
+                    <ProbabilitiesDisplay
+                      probabilities={filterTagsByThreshold(
+                        validateProbabilities(prediction.general),
+                        0.35,
+                      )}
+                    />
+                  </div>
+                </section>
+              {/each}
             </div>
-          {/each}
-        </div>
+          </div>
+        {:else}
+          <div class="flex flex-col h-[100vh] justify-center text-center">
+            <p class="mb-10">No data to show</p>
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -108,8 +150,6 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    text-align: center;
     height: 100vh;
   }
 </style>
