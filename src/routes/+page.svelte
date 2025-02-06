@@ -7,6 +7,7 @@
   import Dropzone from "@/components/dropzone.svelte";
   import ModelSelect from "@/components/modelSelect.svelte";
   import ProbabilitiesDisplay from "@/components/probabilitiesDisplay.svelte";
+  import { getDefaultModel, getModels } from "@/lib/model";
   import { filterTagsByThreshold } from "@/lib/tags";
   import {
     type Probabilities,
@@ -17,13 +18,13 @@
   import { type } from "arktype";
   import { slide } from "svelte/transition";
 
-  let repoId = $state("SmilingWolf/wd-swinv2-tagger-v3");
+  let model = $state(getDefaultModel());
   let predictions = $state<InferenceResult[]>([]);
   let files = $state<string[]>([]);
   let isProcessing = $state(false);
   let errorMessage = $state("");
 
-  const predict = async (image_paths: string[]) => {
+  const predict = async (image_paths: string[], repoId: string) => {
     const args: BatchleInferenceArgs = {
       model_args: {
         repo_id: repoId,
@@ -50,13 +51,6 @@
     }
   };
 
-  const onFilesSelected = async (files: string[]) => {
-    console.log(files);
-    isProcessing = true;
-    await predict(files);
-    isProcessing = false;
-  };
-
   const validateProbabilities = (
     probs: Partial<{ [key in string]: number }>,
   ): Probabilities => {
@@ -67,6 +61,14 @@
     }
     return result;
   };
+
+  $effect(() => {
+    console.log("files", files);
+    isProcessing = true;
+    predict(files, model.repoId).finally(() => {
+      isProcessing = false;
+    });
+  });
 </script>
 
 <main class="relative w-full background dotted-bg">
@@ -74,12 +76,7 @@
     <div
       class="grow h-full flex flex-col justify-center overflow-y-scroll overflow-x-hidden"
     >
-      <Dropzone
-        bind:files
-        onDrop={(files) => {
-          onFilesSelected(files);
-        }}
-      />
+      <Dropzone bind:files />
 
       {#if files.length === 0}
         <div class="flex flex-col items-center gap-y-4">
@@ -101,13 +98,7 @@
       <div
         class="absolute top-0 self-center max-w-md rounded-b-md bg-blue-500/50 hover:bg-blue-500/90 duration-75 transition-all"
       >
-        <ModelSelect
-          choices={[
-            "SmilingWolf/wd-swinv2-tagger-v3",
-            "SmilingWolf/wd-eva02-large-tagger-v3",
-          ]}
-          selected={repoId}
-        />
+        <ModelSelect choices={getModels()} bind:selected={model} />
       </div>
     </div>
 
