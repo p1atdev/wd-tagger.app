@@ -18,4 +18,4 @@ Run [Waifu Diffusion tagger](https://huggingface.co/spaces/SmilingWolf/wd-tagger
 
 ## Screenshot
 
-![](./doc/screenshot_01.jpg)
+![](./docs/screenshot_01.jpg)
