@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { convertFileSrc } from "@tauri-apps/api/core";
     import type { Event, UnlistenFn } from "@tauri-apps/api/event";
     import {
         type DragDropEvent,

@@ -14,19 +14,21 @@
       {
         "title": "wd-tagger",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "transparent": true
       }
     ],
     "security": {
       "csp": {
-        "default-src": "'self' ipc: http://ipc.localhost",
-        "img-src": "'self' asset: http://asset.localhost blob: data:"
+        "default-src": "'self' ipc: http://ipc.localhost/",
+        "img-src": "'self' asset: http://asset.localhost/ blob: data:"
       },
       "assetProtocol": {
         "enable": true,
         "scope": []
       }
-    }
+    },
+    "macOSPrivateApi": true
   },
   "bundle": {
     "active": true,

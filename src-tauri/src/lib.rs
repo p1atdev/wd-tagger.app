@@ -1,7 +1,9 @@
 mod tagger;
 
 use specta_typescript::Typescript;
+use tauri::Manager;
 use tauri_specta::{collect_commands, Builder};
+use window_vibrancy::*;
 
 use tagger::{
     inference_batch_images, inference_single_image, BatchleInferenceArgs, InferenceResult,
@@ -41,6 +43,16 @@ pub fn run() {
         .setup(move |app| {
             // This is also required if you want to use events
             builder.mount_events(app);
+
+            let window = app.get_webview_window("main").unwrap();
+
+            #[cfg(target_os = "macos")]
+            apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+
+            #[cfg(target_os = "windows")]
+            apply_mica(&window, None)
+                .expect("Unsupported platform! 'apply_mica' is only supported on Windows");
 
             Ok(())
         })

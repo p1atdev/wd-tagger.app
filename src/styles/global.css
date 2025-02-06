@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 .dotted-bg {
-    background-image: radial-gradient(circle, --alpha(var(--color-blue-500) / 30%) 2px, transparent 2px);
-    background-size: 40px 40px;
+  background-image: radial-gradient(circle, --alpha(var(--color-blue-500) / 30%) 2px, transparent 2px);
+  background-size: 40px 40px;
 
-    @media (prefers-color-scheme: dark) {
-        background-image: radial-gradient(circle, --alpha(var(--color-blue-400) / 30%) 2px, transparent 2px);
-    }
+  @media (prefers-color-scheme: dark) {
+    background-image: radial-gradient(circle, --alpha(var(--color-blue-400) / 30%) 2px, transparent 2px);
+  }
 }
 
-
 :root {
-    background-color: #f8f9fa;
+  background-color: --alpha(#f8f9fa / 50%);
 
-    color: #333;
+  color: #333;
 
-    @media (prefers-color-scheme: dark) {
-        background-color: #121212;
-        color: #f8f9fa;
-    }
+  @media (prefers-color-scheme: dark) {
+    background-color: --alpha(#121212 / 50%);
+    color: #f8f9fa;
+  }
 }
 
 body {
-    overflow: hidden;
+  overflow: hidden;
+}
+
+html,
+body {
+  background: transparent;
+}
+
+/* reset */
+select,
+option {
+  appearance: none;
 }

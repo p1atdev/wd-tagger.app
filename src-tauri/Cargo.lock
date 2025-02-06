@@ -4747,6 +4747,7 @@ dependencies = [
  "thiserror 2.0.11",
  "tokio",
  "wd-tagger",
+ "window-vibrancy 0.5.2 (git+https://github.com/tauri-apps/window-vibrancy)",
 ]
 
 [[package]]
@@ -4863,7 +4864,7 @@ dependencies = [
  "urlpattern",
  "webkit2gtk",
  "webview2-com",
- "window-vibrancy",
+ "window-vibrancy 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "windows",
 ]
 
@@ -6013,6 +6014,19 @@ name = "window-vibrancy"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ea403deff7b51fff19e261330f71608ff2cdef5721d72b64180bb95be7c4150"
+dependencies = [
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "raw-window-handle",
+ "windows-sys 0.59.0",
+ "windows-version",
+]
+
+[[package]]
+name = "window-vibrancy"
+version = "0.5.2"
+source = "git+https://github.com/tauri-apps/window-vibrancy#44f5fea33b9e0be5cc69f39d8f7fd6b3d02bb744"
 dependencies = [
  "objc2",
  "objc2-app-kit",
